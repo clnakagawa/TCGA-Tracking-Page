@@ -4,18 +4,32 @@ data: "`r Sys.Date()`"
 output: flexdashboard::flex_dashboard
 ---
 
-```{r, results='asis', echo=FALSE}
+```{r libraries}
 library(htmltools)
+library(stringr)
+library(data.table)
+library(DT)
+library(ggplot2)
+library(patchwork)
+```
+
+# Workspace Directory
+
+## Column 1
+
+### Workspace Page Links {data-height=200}
+
+```{r, results='asis', echo=FALSE}
 html_files <- list.files(path = "Reports", full.names = FALSE)
 
 if (length(html_files) > 0) {
 # Map each file directly to a styled HTML div container
   links <- lapply(html_files, function(file) {
     relative_path <- file.path("Reports", file)
-    display_name  <- gsub("_", " ", gsub("_Cost_Report\\.html$", "", file))
+    display_name  <- gsub("_", " ", gsub("_Cost_Report.html$", "", file))
     
     tags$div(
-      style = "font-size: 50px; margin-bottom: 20px;",
+      style = "font-size: 30px; margin-bottom: 10px;",
       tags$a(href = relative_path, display_name)
     )
   })
@@ -25,4 +39,54 @@ if (length(html_files) > 0) {
 } else {
   cat("_No reports found in the subdirectory._\n")
 }
+```
+
+## Column 2
+
+### Workspace Progress
+
+```{r progress_gauges, out.width="90%", out.height="100%"}
+wsNames <- gsub("_Cost_Report.html", "", html_files)
+wsDataPath <- "~/Desktop/Projects/Cost-Monitor/data/"
+
+outputs <- c("name", "attributes.reblock_gvcf", "attributes.charr_output", "attributes.demographics_file",
+             "attributes.melt_vcf", "attributes.wham_vcf", "attributes.manta_vcf", "attributes.coverage_counts",
+             "attributes.pesr_disc", "attributes.pesr_split", "attributes.pesr_sd")
+
+wsTbls <- lapply(wsNames, function(ws) {
+  tbl <- fread(paste0(wsDataPath, ws, "/tcga_attributes.tsv"))
+  tbl <- tbl[,intersect(colnames(tbl), outputs), with = F]
+  tbl[, let(status = fifelse(rowSums(tbl != "", na.rm = T) == length(outputs), "Complete", "Incomplete"),
+            file_count = rowSums(tbl != "", na.rm = T) - 1)]
+  tbl
+})
+names(wsTbls) <- wsNames
+
+fileComplete <- lapply(wsNames, function(ws) {
+  data.table(status = factor(c("Complete", "Incomplete"), levels = c("Incomplete", "Complete")),
+             count = c(sum(wsTbls[[ws]]$file_count),
+                       nrow(wsTbls[[ws]]) * (length(outputs) - 1) - sum(wsTbls[[ws]]$file_count)))
+})
+names(fileComplete) <- wsNames
+
+
+progPlots <- lapply(wsNames, function(ws) {
+  tmp <- wsTbls[[ws]][,.(count=.N),by=status][,.(status = factor(status, levels = c("Incomplete", "Complete")), count)]
+  fileData <- fileComplete[[ws]]
+  sampPlt <- ggplot(tmp, aes(fill = status, y = "Progress", x = count)) + geom_bar(position="fill", stat="identity", orientation="y") + 
+    scale_fill_manual(values = c("Complete" = "green", "Incomplete" = "gray")) +
+    theme_void() +
+    theme(aspect.ratio = 0.03, legend.position = 'none', plot.title = element_text(size = 10)) +
+    ggtitle(paste0(ws, "\n(", round(nrow(wsTbls[[ws]][status=="Complete"]) * 100 / nrow(wsTbls[[ws]]), 2), "% samples complete, ",
+      round(fileData[status=="Complete"]$count[1] * 100 / sum(fileData$count), 2), "% outputs generated)"))
+  
+
+  filePlt <- ggplot(fileData, aes(fill = status, y = "Progress", x = count)) + geom_bar(position="fill", stat="identity", orientation="y") +
+    scale_fill_manual(values = c("Complete" = "orange", "Incomplete" = "gray")) +
+    theme_void() +
+    theme(aspect.ratio = 0.03, legend.position = 'none') 
+  sampPlt  / filePlt
+})
+
+wrap_plots(progPlots, ncol = 1)
 ```
