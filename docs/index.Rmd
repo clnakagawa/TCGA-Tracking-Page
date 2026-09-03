@@ -1,0 +1,26 @@
+---
+title: "Workspace Tracker `r Sys.Date()`"
+data: "`r Sys.Date()`"
+output: flexdashboard::flex_dashboard
+---
+
+```{r, results='asis', echo=FALSE}
+html_files <- list.files(path = "Reports", full.names = FALSE)
+
+# 3. Check if files exist, then loop and generate relative paths
+if (length(html_files) > 0) {
+  for (file in html_files) {
+    # Create the relative URL path (e.g., Reports/report1.html)
+    relative_path <- file.path("Reports", file)
+    
+    # Create a clean display name (e.g., "Report1" instead of "report1.html")
+    display_name <- gsub(".html", "", file)
+    display_name <- gsub("_", " ", display_name) # Replaces underscores with spaces for readability
+    
+    # Output the Markdown link
+    cat(sprintf("[%s](%s)\n", display_name, relative_path))
+  }
+} else {
+  cat("_No reports found in the subdirectory._\n")
+}
+```
