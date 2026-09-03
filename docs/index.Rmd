@@ -5,21 +5,23 @@ output: flexdashboard::flex_dashboard
 ---
 
 ```{r, results='asis', echo=FALSE}
+library(htmltools)
 html_files <- list.files(path = "Reports", full.names = FALSE)
 
-# 3. Check if files exist, then loop and generate relative paths
 if (length(html_files) > 0) {
-  for (file in html_files) {
-    # Create the relative URL path (e.g., Reports/report1.html)
+# Map each file directly to a styled HTML div container
+  links <- lapply(html_files, function(file) {
     relative_path <- file.path("Reports", file)
+    display_name  <- gsub("_", " ", gsub("_Cost_Report\\.html$", "", file))
     
-    # Create a clean display name (e.g., "Report1" instead of "report1.html")
-    display_name <- gsub(".html", "", file)
-    display_name <- gsub("_", " ", display_name) # Replaces underscores with spaces for readability
-    
-    # Output the Markdown link
-    cat(sprintf("[%s](%s)\n", display_name, relative_path))
-  }
+    tags$div(
+      style = "font-size: 50px; margin-bottom: 20px;",
+      tags$a(href = relative_path, display_name)
+    )
+  })
+  
+  # Render all elements cleanly into the document
+  tagList(links)
 } else {
   cat("_No reports found in the subdirectory._\n")
 }
