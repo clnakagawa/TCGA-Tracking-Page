@@ -77,7 +77,7 @@ progPlots <- lapply(wsNames, function(ws) {
     scale_fill_manual(values = c("Complete" = "green", "Incomplete" = "gray")) +
     theme_void() +
     theme(aspect.ratio = 0.03, legend.position = 'none', plot.title = element_text(size = 10)) +
-    ggtitle(paste0(ws, "\n(", round(nrow(wsTbls[[ws]][status=="Complete"]) * 100 / nrow(wsTbls[[ws]]), 2), "% samples complete, ",
+    ggtitle(paste0(ws, "\n(", nrow(wsTbls[[ws]][status=="Complete"]), "/", nrow(wsTbls[[ws]]), "% samples complete, ",
       round(fileData[status=="Complete"]$count[1] * 100 / sum(fileData$count), 2), "% outputs generated)"))
   
 
