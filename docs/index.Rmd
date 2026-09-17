@@ -17,19 +17,44 @@ library(patchwork)
 
 ## Column 1
 
-### Workspace Page Links {data-height=200}
+### TCGA Workspace Page Links {data-height=500}
 
 ```{r, results='asis', echo=FALSE}
 html_files <- list.files(path = "Reports", full.names = FALSE)
 
-if (length(html_files) > 0) {
+
+tcga_files <- html_files[html_files %like% "TCGA"]
+if (length(tcga_files) > 0) {
 # Map each file directly to a styled HTML div container
-  links <- lapply(html_files, function(file) {
+  links <- lapply(tcga_files, function(file) {
     relative_path <- file.path("Reports", file)
     display_name  <- gsub("_", " ", gsub("_Cost_Report.html$", "", file))
     
     tags$div(
-      style = "font-size: 30px; margin-bottom: 10px;",
+      style = "font-size: 20px; margin-bottom: 10px;",
+      tags$a(href = relative_path, display_name)
+    )
+  })
+  
+  # Render all elements cleanly into the document
+  tagList(links)
+} else {
+  cat("_No reports found in the subdirectory._\n")
+}
+```
+
+### Other Workspace Reports
+
+```{r}
+other_files <- html_files[!html_files %like% "TCGA"]
+if (length(other_files) > 0) {
+# Map each file directly to a styled HTML div container
+  links <- lapply(other_files, function(file) {
+    relative_path <- file.path("Reports", file)
+    display_name  <- gsub("_", " ", gsub("_Cost_Report.html$", "", file))
+    
+    tags$div(
+      style = "font-size: 20px; margin-bottom: 10px;",
       tags$a(href = relative_path, display_name)
     )
   })
@@ -43,10 +68,11 @@ if (length(html_files) > 0) {
 
 ## Column 2
 
-### Workspace Progress
+### TCGA Workspace Progress
 
 ```{r progress_gauges, out.width="90%", out.height="100%"}
 wsNames <- gsub("_Cost_Report.html", "", html_files)
+wsNames <- wsNames[wsNames %like% "TCGA"]
 wsDataPath <- "~/Desktop/Projects/Cost-Monitor/data/"
 
 outputs <- c("name", "attributes.reblock_gvcf", "attributes.charr_output", "attributes.demographics_file",
