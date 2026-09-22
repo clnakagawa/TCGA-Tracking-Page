@@ -73,7 +73,7 @@ if (length(other_files) > 0) {
 ```{r progress_gauges, out.width="90%", out.height="100%"}
 wsNames <- gsub("_Cost_Report.html", "", html_files)
 wsNames <- wsNames[wsNames %like% "TCGA"]
-wsDataPath <- "~/Desktop/Projects/Cost-Monitor/data/"
+wsDataPath <- "~/Projects/Cost-Monitor/data/"
 
 outputs <- c("name", "attributes.reblock_gvcf", "attributes.charr_output", "attributes.demographics_file",
              "attributes.melt_vcf", "attributes.wham_vcf", "attributes.manta_vcf", "attributes.coverage_counts",
