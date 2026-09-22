@@ -17,7 +17,7 @@ library(patchwork)
 
 ## Column 1
 
-### TCGA Workspace Page Links {data-height=500}
+### TCGA Workspace Page Links {data-height=700}
 
 ```{r, results='asis', echo=FALSE}
 html_files <- list.files(path = "Reports", full.names = FALSE)
