@@ -17,7 +17,7 @@ library(patchwork)
 
 ## Column 1
 
-### TCGA Workspace Page Links {data-height=700}
+### TCGA Workspace Page Links {data-height=900}
 
 ```{r, results='asis', echo=FALSE}
 html_files <- list.files(path = "Reports", full.names = FALSE)
@@ -31,7 +31,7 @@ if (length(tcga_files) > 0) {
     display_name  <- gsub("_", " ", gsub("_Cost_Report.html$", "", file))
     
     tags$div(
-      style = "font-size: 20px; margin-bottom: 10px;",
+      style = "font-size: 16px; margin-bottom: 10px;",
       tags$a(href = relative_path, display_name)
     )
   })
