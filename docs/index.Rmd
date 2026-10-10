@@ -43,7 +43,7 @@ if (length(tcga_files) > 0) {
 }
 ```
 
-### Other Workspace Reports
+### Other Workspace Reports {data-height=100}
 
 ```{r}
 other_files <- html_files[!html_files %like% "TCGA"]
@@ -70,7 +70,7 @@ if (length(other_files) > 0) {
 
 ### TCGA Workspace Progress
 
-```{r progress_gauges, out.width="90%", out.height="100%"}
+```{r progress_gauges, out.width="90%", out.height="100%", fig.height = 15, fig.width = 6}
 wsNames <- gsub("_Cost_Report.html", "", html_files)
 wsNames <- wsNames[wsNames %like% "TCGA"]
 wsDataPath <- "~/Projects/Cost-Monitor/data/"
